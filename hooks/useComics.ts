@@ -1,5 +1,5 @@
+'use client';
 import { useEffect, useState } from 'react';
-
 
 // Get All Comics
 export const getComics = async () => {
@@ -9,6 +9,21 @@ export const getComics = async () => {
       'Content-Type': 'application/json',
     },
   });
+  const data = await response.json();
+  return data.data;
+};
+
+// Get Comic By Slug (server-side)
+export const getComicBySlug = async (slug: string) => {
+  const response = await fetch(
+    `https://otruyenapi.com/v1/api/truyen-tranh/${slug}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   const data = await response.json();
   return data.data;
 };
@@ -36,16 +51,26 @@ export const useComics = () => {
   return { comics, loading, error };
 };
 
-
 // Get Comics By Slug
-export const getComicsBySlug = async (slug: string) => {
-  const response = await fetch(`https://otruyenapi.com/v1/api/truyen-tranh/${slug}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  const data = await response.json();
+export const useComicsBySlug = (slug: string) => {
+  const [comic, setComic] = useState<any>([]);
 
-  return data;
+  useEffect(() => {
+    const fetchComic = async () => {
+      const response = await fetch(
+        `https://otruyenapi.com/v1/api/truyen-tranh/${slug}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await response.json();
+      setComic(data.data);
+    };
+    fetchComic();
+  }, []);
+
+  return { comic };
 };
